@@ -28,7 +28,7 @@ module.exports = class Controller {
     });
   }
 
-  static deleted(res, message = "Deleted") {
+  static deleted({ res, message = "Deleted" }) {
     return res.status(204).json({ message });
   }
 

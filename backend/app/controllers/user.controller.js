@@ -30,7 +30,7 @@ class UserController extends Controller {
   async findOne(req, res, next) {
     try {
       const { user } = req;
-      return Controller.ok({ res, data: "find one", message: user });
+      return Controller.ok({ res, data: user });
     } catch (error) {
       return Controller.badRequest({ res, data: error });
     }
@@ -45,10 +45,13 @@ class UserController extends Controller {
         where.status = status;
       }
       if (search) {
-        where[Op.or] = [
-          { id: search },
+        const searchQuery = [
           { full_name: { [Op.iLike]: `%${search}%` } },
-        ];
+        ]
+        if (!isNaN(search)) {
+          searchQuery.push({ id: Number(search) })
+        }
+        where[Op.or] = searchQuery;
       }
       const query = {
         where,
@@ -68,16 +71,18 @@ class UserController extends Controller {
       await validateEmail(body);
       const user = await User.create(body);
       let card;
+
       if (body.card) {
         card = await Card.create({ ...body.card, user_id: user.id });
       }
+
       return Controller.created({
         res,
         message: "Create user",
         data: { user, card },
       });
     } catch (error) {
-      return Controller.badRequest({ res, data: error });
+      return Controller.badRequest({ res, message: error });
     }
   }
 
@@ -86,10 +91,8 @@ class UserController extends Controller {
       const { user } = req;
       const { body } = req;
       await user.update(body);
-      if (body.card && user.card) {
-        await user.card.update(body.card);
-      }
-      return Controller.ok({ res, message: "Update User" });
+
+      return Controller.ok({ res, data: user, message: "Update User" });
     } catch (error) {
       return Controller.badRequest({ res, data: error });
     }
@@ -99,6 +102,7 @@ class UserController extends Controller {
     try {
       const { user } = req;
       await user.destroy();
+
       return Controller.deleted({ res });
     } catch (error) {
       return Controller.badRequest({ res, data: error });
@@ -113,7 +117,7 @@ class UserController extends Controller {
       if (!user) {
         throw "Not found user";
       }
-      req.user = user_id;
+      req.user = user;
       next();
     } catch (error) {
       Controller.notFound({ res });

@@ -14,14 +14,15 @@ export const fecthNotification = async ({
   try {
     setLoading(true);
     await fetch();
+    setLoading(false);
     if (succesNofitication) {
-      openNotificationWithIcon({ type: "sucess", message: messageSucces });
+      openNotificationWithIcon({ type: "success", message: messageSucces });
     }
+
   } catch (error) {
     if (errorNotification) {
+      setLoading(false);
       openNotificationWithIcon({ type: "error", message: error });
     }
-  } finally {
-    setLoading(false);
   }
 };
