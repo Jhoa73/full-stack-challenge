@@ -9,6 +9,10 @@ cd ./frontend
 ```
 
 ```
+rename  file ".env.example" for ".env"  add include real values.
+```
+
+```
 npm install
 ```
 
@@ -20,6 +24,10 @@ npm run start
 
 ```
 cd ./backend
+```
+
+```
+rename  file ".env.example" for ".env"  add include real values.
 ```
 
 ```
