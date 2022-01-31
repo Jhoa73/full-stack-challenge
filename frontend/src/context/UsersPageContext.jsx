@@ -1,76 +1,54 @@
 import { useState } from "react";
 import { createContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import userService from "service/UserService";
+import { fecthNotification } from "utils/fetchNotification";
 import { routes } from "utils/routes";
 
-const DUMMY = [
-  {
-    id: 1,
-    email: "email@test.com",
-    phone: "9991436349",
-    full_name: "Nelson Jhoan Concha Canto",
-    birthdate: new Date(),
-    status: "PENDIENTE",
-    analyst_name: "Pedro",
-    card: {
-      card_number: "",
-      brand: "",
-      cvv: "",
-      pin: "",
-      expiration_date: "",
-    },
-  },
-  {
-    id: 2,
-    email: "email@test.com",
-    phone: "9991436349",
-    full_name: "Nelson Jhoan Concha Canto",
-    birthdate: new Date(),
-    status: "COMPLETADO",
-    analyst_name: "Pedro",
-    card: {
-      card_number: "",
-      brand: "",
-      cvv: "",
-      pin: "",
-      expiration_date: "",
-    },
-  },
-  {
-    id: 3,
-    email: "email@test.com",
-    phone: "9991436349",
-    full_name: "Nelson Jhoan Concha Canto",
-    birthdate: new Date(),
-    status: "PROCESO",
-    analyst_name: "Pedro",
-    card: {
-      card_number: "",
-      brand: "",
-      cvv: "",
-      pin: "",
-      expiration_date: "",
-    },
-  },
-];
-
 export const UsersPageContext = createContext(undefined);
+
+const INITIAL_USER_PARAMS = {
+  search: "",
+  status: "",
+};
 
 export const UsersPageProvider = ({ children }) => {
   const navigate = useNavigate();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [userParams, setUserParams] = useState(INITIAL_USER_PARAMS);
 
   useEffect(() => {
-    getUsers();
-  }, []);
+    fecthNotification({
+      fetch: getUsers,
+      setLoading,
+    });
+    return;
+  }, [userParams]);
 
-  const getUsers = () => {
-    setUsers(DUMMY);
+  const getUsers = async () => {
+    const users = await userService.findAll(userParams);
+    setUsers(users);
   };
+
+  const onChangeSearch = (search) => setUserParams({ ...userParams, search });
+
+  const onChangeStatus = (status) => setUserParams({ ...userParams, status });
 
   const onAdd = () => {
     navigate(routes.userAdd);
+  };
+
+  const onDelete = async (use_id) => {
+    await fecthNotification({
+      fetch: async () => {
+        await userService.delete(use_id);
+        getUsers();
+      },
+      setLoading,
+      succesNofitication: true,
+      messageSucces: "Usuario eliminado correctamente",
+    });
   };
 
   const onEdit = (id) => {
@@ -80,8 +58,11 @@ export const UsersPageProvider = ({ children }) => {
   const contextValue = {
     loading,
     users,
+    onChangeSearch,
+    onChangeStatus,
     onAdd,
     onEdit,
+    onDelete,
   };
   return (
     <UsersPageContext.Provider value={contextValue}>

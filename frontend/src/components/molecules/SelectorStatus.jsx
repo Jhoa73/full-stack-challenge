@@ -6,5 +6,7 @@ export const SelectorStatus = ({ ...props }) => {
     label: option,
     value: option,
   }));
-  return <Select {...props} options={options} style={{ width: "100%" }} />;
+  return (
+    <Select {...props} options={options} style={{ width: "100%" }} allowClear />
+  );
 };

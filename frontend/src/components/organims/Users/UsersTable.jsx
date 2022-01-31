@@ -90,8 +90,8 @@ const getColumns = ({ onEdit = () => {}, onDelete = () => {} }) => {
 };
 
 export const UsersTable = () => {
-  const { users, onEdit, loading } = useContext(UsersPageContext);
-  const columns = getColumns({ onEdit });
+  const { users, onEdit, onDelete, loading } = useContext(UsersPageContext);
+  const columns = getColumns({ onEdit, onDelete });
 
   return <AppTable columns={columns} data={users} loading={loading} />;
 };

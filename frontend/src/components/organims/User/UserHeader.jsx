@@ -16,13 +16,15 @@ const ColTitle = styled(Col)`
 `;
 
 export const UserHeader = () => {
-  const { user, loading } = useContext(UserPageContext);
+  const { user, loading, onUdateStatus } = useContext(UserPageContext);
   const { id, full_name } = user ?? {};
 
   const menu = () => (
-    <Menu onClick={(key) => console.log(key)}>
+    <Menu onClick={({ key }) => onUdateStatus(key)}>
       {STATUS_OPTIONS.map((option) => (
-        <Menu.Item key={option}>{option}</Menu.Item>
+        <Menu.Item key={option} disabled={option === user?.status}>
+          {option}
+        </Menu.Item>
       ))}
     </Menu>
   );

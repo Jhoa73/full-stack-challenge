@@ -69,12 +69,31 @@ export const UserForm = () => {
         cvv: cardRandom.cvv,
         pin: cardRandom.pin,
       }
-    : user?.card;
+    : user?.Card;
   const initialValues = { ...user, birthdate, ...card } ?? {};
 
   if ((!user && !isAdd) || (isAdd && !card)) {
     return null;
   }
+
+  const onFinish = async (data) => {
+    const body = isAdd ? formatCreate(data) : data;
+    await onSubmit(body);
+    if (!isAdd) {
+      setAllowEdition(false);
+    }
+  };
+
+  const formatCreate = (data) => {
+    const card = {
+      card_number: data.card_number,
+      brand: data.brand,
+      cvv: data.cvv,
+      pin: data.pin,
+      expiration_date: data.expiration_date,
+    };
+    return { ...data, card };
+  };
 
   const rulesEmail = allowEdition
     ? [
@@ -158,7 +177,7 @@ export const UserForm = () => {
     : [];
 
   return (
-    <Form onFinish={onSubmit} initialValues={initialValues}>
+    <Form onFinish={onFinish} initialValues={initialValues}>
       <Row gutter={[0, 10]} justify="space-between">
         <Col xs={24} lg={12}>
           <FormItem name="email" label="EMAIL" rules={rulesEmail}>
